@@ -139,9 +139,9 @@ void CheckCombination() {
 // Called when a combination key (Numpad 1-9) is pressed
 void OnPress(int KeyCode) {
 	if (CombinationCount > 0)
-		CurrentCombination += " " + std::to_string(KeyCode);
+		CurrentCombination += " " + std::to_string(KeyCode - 96);
 	else
-		CurrentCombination = std::to_string(KeyCode);
+		CurrentCombination = std::to_string(KeyCode - 96);
 
 	CombinationCount++;
 	StartTime = std::chrono::steady_clock::now();
