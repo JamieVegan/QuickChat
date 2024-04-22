@@ -127,12 +127,18 @@ void SendCombination(str Text) {
 void CheckCombination() {
 	if (Combinations[CurrentCombination] != "") {
 		SendCombination(Combinations[CurrentCombination]);
+		CurrentCombination = "";
+		CombinationCount = 0;
+	}
+	if (CombinationCount == 2) {
+		CurrentCombination = "";
+		CombinationCount = 0;
 	}
 }
 
 // Called when a combination key (Numpad 1-9) is pressed
 void OnPress(int KeyCode) {
-	if (CurrentCombination.size() > 0)
+	if (CombinationCount > 0)
 		CurrentCombination += " " + std::to_string(KeyCode);
 	else
 		CurrentCombination = std::to_string(KeyCode);
