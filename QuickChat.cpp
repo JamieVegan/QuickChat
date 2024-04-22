@@ -30,11 +30,26 @@ void KeyboardWrite(str Text, int Delay = 0) {
 		SHORT VK = VkKeyScanEx(Character, KeyboardLayout);
 		unsigned int VSC = MapVirtualKey(VK, MAPVK_VK_TO_VSC);
 
+		SHORT VK2 = 0;
+		unsigned int VSC2 = 0;
+
+		// Shift press
+		if (isupper(Character)) {
+			VK2 = VK_LSHIFT;
+			VSC = MapVirtualKey(VK2, MAPVK_VK_TO_VSC);
+			keybd_event(VK2, VSC2, 0, 0);
+		}
+
 		// Press
 		keybd_event(VK, VSC, 0, 0);
 
 		// Release
 		keybd_event(VK, VSC, KEYEVENTF_KEYUP, 0);
+
+		// Shift release
+		if (isupper(Character)) {
+			keybd_event(VK2, VSC2, KEYEVENTF_KEYUP, 0);
+		}
 
 		if (Delay > 0) {
 			Sleep(Delay);
@@ -43,9 +58,19 @@ void KeyboardWrite(str Text, int Delay = 0) {
 }
 
 // Single key
-void KeyboardPress(int Character, int Delay = 0) {
+void KeyboardPress(int Character) {
 	SHORT VK = VkKeyScanEx(Character, KeyboardLayout);
 	unsigned int VSC = MapVirtualKey(VK, MAPVK_VK_TO_VSC);
+
+	SHORT VK2 = 0;
+	unsigned int VSC2 = 0;
+
+	// Shift press
+	if (isupper(Character)) {
+		VK2 = VK_LSHIFT;
+		VSC = MapVirtualKey(VK2, MAPVK_VK_TO_VSC);
+		keybd_event(VK2, VSC2, 0, 0);
+	}
 
 	// Press
 	keybd_event(VK, VSC, 0, 0);
@@ -53,8 +78,9 @@ void KeyboardPress(int Character, int Delay = 0) {
 	// Release
 	keybd_event(VK, VSC, KEYEVENTF_KEYUP, 0);
 
-	if (Delay > 0) {
-		Sleep(Delay);
+	// Shift release
+	if (isupper(Character)) {
+		keybd_event(VK2, VSC2, KEYEVENTF_KEYUP, 0);
 	}
 }
 
@@ -74,13 +100,20 @@ void SendCombination(str Text) {
 		KeyboardPress(VK_RETURN);
 		Sleep(80);
 	}
-	else {
+	else if (WString.ends_with(L"Discord")) {
 		std::cout << CombinationCount << "\n";
 		for (int i = 0; i < CombinationCount; i++) {
 			KeyboardPress(VK_BACK);
 		}
 		KeyboardWrite(Text);
 		KeyboardPress(VK_RETURN);
+	}
+	else {
+		std::cout << CombinationCount << "\n";
+		for (int i = 0; i < CombinationCount; i++) {
+			KeyboardPress(VK_BACK);
+		}
+		KeyboardWrite(Text);
 	}
 }
 
