@@ -1,12 +1,16 @@
-#include "Combinations.h"
-// ^ Remove line or create your own Combinations.h
-
 #include <iostream>
 #include <Windows.h>
 #include <map>
 #include <functional>
 #include <chrono>
 
+// JSON
+// License is at Libraries/nlohmann/LICENSE.MIT
+#include "Libraries/nlohmann/json.hpp"
+#include <fstream>
+using json = nlohmann::json;
+
+// timeBeginPeriod & timeEndPeriod
 #pragma comment(lib, "winmm.lib")
 
 #define VK_SLASH 0x2F
@@ -23,6 +27,8 @@ str CurrentCombination = "";
 int CombinationCount = 0;
 
 HKL KeyboardLayout = GetKeyboardLayout(0);
+
+std::map<str, str> Combinations;
 
 void KeyboardWrite(str Text, int Delay = 0) {
 	for (char Character : Text) {
@@ -119,17 +125,8 @@ void SendCombination(str Text) {
 
 // Checks if the current combination is valid, and sends its text if it is.
 void CheckCombination() {
-	// Combinations is a map<str, str> formatted like so:
-	// std::map<std::string, std::string> Combinations = { { "97 97", "hello" }, { "97 98", "hi" } };
-	// The key is the combination, the value is the text to be sent from that combination
-	// Numpad1 is 97, Numpad2 is 98 and so on till Numpad9 (105)
-
-	for (auto const& [Combination, Text] : Combinations)
-	{
-		if (CurrentCombination == Combination) {
-			std::cout << "Combination" << "\n";
-			SendCombination(Text);
-		}
+	if (Combinations[CurrentCombination] != "") {
+		SendCombination(Combinations[CurrentCombination]);
 	}
 }
 
@@ -154,6 +151,22 @@ std::map<int, bool> KeyStates = {};
 int main()
 {
 	timeBeginPeriod(1);
+
+	std::ifstream File("Combinations.json");
+
+	try {
+		json JSONCombinations = json::parse(File);
+		Combinations = JSONCombinations.get<std::map<str, str>>();
+	}
+	catch (json::parse_error Exception) {
+		std::cerr << "Failed to parse Combinations.json" << "\n";
+		std::cerr << "Double check that your json is valid" << "\n";
+		Sleep(4000);
+		return -1;
+	}
+
+	File.close();
+
 	// Create key state for each bind
 	for (auto const& [Key, Function] : Keybinds)
 	{
@@ -188,4 +201,5 @@ int main()
 		Sleep(1);
 	}
 	timeEndPeriod(1);
+	return 0;
 }
