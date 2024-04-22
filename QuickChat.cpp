@@ -107,7 +107,6 @@ void SendCombination(str Text) {
 		Sleep(80);
 	}
 	else if (WString.ends_with(L"Discord")) {
-		std::cout << CombinationCount << "\n";
 		for (int i = 0; i < CombinationCount; i++) {
 			KeyboardPress(VK_BACK);
 		}
@@ -115,7 +114,6 @@ void SendCombination(str Text) {
 		KeyboardPress(VK_RETURN);
 	}
 	else {
-		std::cout << CombinationCount << "\n";
 		for (int i = 0; i < CombinationCount; i++) {
 			KeyboardPress(VK_BACK);
 		}
@@ -158,11 +156,13 @@ int main()
 {
 	timeBeginPeriod(1);
 
+	std::cout << "Parsing Combinations.json" << "\n";
 	std::ifstream File("Combinations.json");
 
 	try {
 		json JSONCombinations = json::parse(File);
 		Combinations = JSONCombinations.get<std::map<str, str>>();
+		std::cout << "Successfully parsed" << "\n";
 	}
 	catch (json::parse_error Exception) {
 		std::cerr << "Failed to parse Combinations.json" << "\n";
@@ -193,8 +193,6 @@ int main()
 		for (auto const& [Key, Function] : Keybinds)
 		{
 			KeyState = GetAsyncKeyState(Key);
-
-			//std::cout << KeyState << "\n";
 
 			if (KeyState < 0 && KeyStates[Key] == false) {
 				KeyStates[Key] = true;
